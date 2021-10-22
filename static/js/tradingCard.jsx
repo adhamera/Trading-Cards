@@ -59,19 +59,58 @@ function TradingCard(props) {
   );
 }
 
+function AddTradingCard(props) {
+  const [name, setName] = React.useState("");
+  const [skill, setSkill] = React.useState("");
+  function addNewCard() {
+
+    const postRequest = {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ name, skill })
+    };
+    
+    fetch('/add-card', postRequest)
+    .then(response => response.json())
+    .then(data => alert(`You have sucessfully added a card! ${data}`))
+  }
+
+  return (
+    <React.Fragment>
+      <h2>Add New Trading Card</h2>
+      <label htmlFor="nameInput">Name</label>
+      <input
+        value={name}
+        onChange={(event) => setName(event.target.value)}
+        id="nameInput"
+        style={{ marginLeft: "5px" }}></input>
+      <label
+        htmlFor="skillInput"
+        style={{ marginLeft: "10px", marginRight: "5px" }}>
+        Skill
+      </label>
+      <input
+        value={skill}
+        onChange={(event) => setSkill(event.target.value)}
+        id="skillInput"></input>
+      <button style={{ marginLeft: "10px" }} onClick={addNewCard}>
+        Add
+      </button>
+    </React.Fragment>
+  );
+}
 
 function TradingCardContainer() {
   const tradingCards = [];
+  const [cards, setCards] = React.useState([]);
+  // where cards == []
+  // and setCards is our function, the one we should manipulate to add more cards
 
-  const floatCard = {
-    name: "Float",
-    skill: "baking pretzels",
-    imgUrl: '/static/img/float.jpg',
-  };
-
-  const [cards, setCards] = React.useState([floatCard]);
-  // cards == []
-  // setCards is our function, the one we should manipulate to add more cards
+  React.useEffect (() => {
+    fetch('/cards.json')
+    .then(response => response.json())
+    .then(data => setCards(data.cards))
+  }, [])
 
   for (const currentCard of cards) {
     tradingCards.push(
@@ -82,6 +121,14 @@ function TradingCardContainer() {
         skill={currentCard.skill}
         imgUrl={currentCard.imgUrl}
       />
+    );
+
+    return (
+      <React.Fragment>
+        <AddTradingCard />
+        <h2>Trading Cards</h2>
+        <div className="grid">{tradingCards}</div>
+      </React.Fragment>
     );
   }
 
